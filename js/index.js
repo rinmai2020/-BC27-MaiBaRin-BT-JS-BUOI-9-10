@@ -55,10 +55,11 @@ function addUser() {
   //B3 Hiển thị staff vừa thêm lên trên giao diện table
   //thêm staff vừa tạo mảng staffList;
   staffList.push(staff);
-  resetFormt();
+
   //B4 Lưu biến staff xuống local storage
   localStorage.setItem("staffList", JSON.stringify(staffList));
   display(staffList);
+  resetFormt();
 }
 
 function display(staffList) {
@@ -81,10 +82,10 @@ function display(staffList) {
       <button class = "btn btn-success" onclick = "selectStaff('${
         staff.account
       }')" data-toggle="modal"
-      data-target="#myModal">Cập nhật</button>
+      data-target="#myModal" >Cập nhật</button>
       <button class = "btn btn-danger" onclick = "deleteStaff('${
         staff.account
-      }')" >Xoá</button>
+      }')"  >Xoá</button>
       </td>
 
     </tr>
@@ -107,16 +108,7 @@ function resetFormt() {
 
   document.getElementById("btnThemNV").disabled = false;
   document.getElementById("tknv").disabled = false;
-
-  // reset thông báo lỗi
-  document.getElementById("tbTKNV").innerHTML = "";
-  document.getElementById("tbTen").innerHTML = "";
-  document.getElementById("tbEmail").innerHTML = "";
-  document.getElementById("tbMatKhau").innerHTML = "";
-  document.getElementById("tbNgay").innerHTML = "";
-  document.getElementById("tbLuongCB").innerHTML = "";
-  document.getElementById("tbChucVu").innerHTML = "";
-  document.getElementById("tbGiolam").innerHTML = "";
+  $("#myModal").modal("hide");
 }
 
 function deleteStaff(staffAccount) {
@@ -209,23 +201,44 @@ function updateStaff() {
   localStorage.setItem("staffList", JSON.stringify(staffList));
   //B4 Gọi hàm display hiển thị
   display(staffList);
+  resetFormt();
 }
 //validator
 function validation() {
   // B1 : DOM lấy value từ inout
   let account = $("tknv").value;
+  var tbTKNV = $("tbTKNV");
+  var checkAccount = /^[0-9]{4,6}$/;
+
   let fullName = $("name").value;
+  var tbTen = $("tbTen");
+  var checkName =
+    /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s\W|_]+$/;
   let email = $("email").value;
+  var tbEmail = $("tbEmail");
+  var emailPattern =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/;
   let password = $("password").value;
+  var tbMatKhau = $("tbMatKhau");
+  var pwPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,10}$/;
+
   let workingDay = $("datepicker").value;
+  var tbNgay = $("tbNgay");
+  var dayPattern =
+    /^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$/;
   let salaryBasic = +$("luongCB").value;
+  var tbLuongCB = $("tbLuongCB");
+
   let position = $("chucvu").value;
+  var tbChucVu = $("tbChucVu");
+
   let timeWork = +$("gioLam").value;
+  var tbGiolam = $("tbGiolam");
+
   var valid = true;
 
   // Kiểm tra tên tài khoản nhân viên
-  var checkAccount = /^[0-9]{4,6}$/;
-  var tbTKNV = $("tbTKNV");
+
   if (!isRequired(account)) {
     valid = false;
     tbTKNV.innerHTML = "Tài khoản là các ký số";
@@ -237,9 +250,7 @@ function validation() {
   }
 
   // kiểm tra tên nhân viên
-  var checkName =
-    /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s\W|_]+$/;
-  var tbTen = $("tbTen");
+
   if (!isRequired(fullName)) {
     valid = false;
     tbTen.innerHTML = "Tên không được để trống";
@@ -251,10 +262,6 @@ function validation() {
   }
 
   // kiểm tra email
-  var emailPattern = new RegExp(
-    "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$"
-  );
-  var tbEmail = $("tbEmail");
 
   if (!isRequired(email)) {
     valid = false;
@@ -262,14 +269,12 @@ function validation() {
   } else if (!emailPattern.test(email)) {
     valid = false;
     tbEmail.innerHTML = "Email không đúng định dạng";
+    email = "";
   } else {
     tbEmail.innerHTML = "";
   }
 
   // kiểm tra password
-  var pwPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,10}$/;
-
-  var tbMatKhau = $("tbMatKhau");
 
   if (!isRequired(password)) {
     valid = false;
@@ -285,9 +290,6 @@ function validation() {
   }
 
   // kiểm tra ngày làm
-  var dayPattern =
-    /^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$/;
-  var tbNgay = $("tbNgay");
 
   if (!isRequired(workingDay)) {
     valid = false;
@@ -300,7 +302,6 @@ function validation() {
   }
 
   // kiểm tra lương cơ bản
-  var tbLuongCB = $("tbLuongCB");
 
   if (!isRequired(salaryBasic)) {
     valid = false;
@@ -313,7 +314,7 @@ function validation() {
   }
 
   // kiểm tra chức vụ
-  var tbChucVu = $("tbChucVu");
+
   if (!isRequired(position)) {
     valid = false;
     tbChucVu.innerHTML = "Chọn chức vụ";
@@ -325,7 +326,7 @@ function validation() {
   }
 
   // kiểm tra giờ làm
-  var tbGiolam = $("tbGiolam");
+
   if (!isRequired(timeWork)) {
     valid = false;
     tbGiolam.innerHTML = "Nhập giờ làm";
